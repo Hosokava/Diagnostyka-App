@@ -3,13 +3,30 @@ package handlers
 import (
 	"gin-quickstart/database"
 	"gin-quickstart/models"
+	"gin-quickstart/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetPatientAppointments(c *gin.Context) {
-	c.JSON(200, gin.H{"message": "Your appointments"})
+	userID := c.MustGet("userID").(uint)
+	var appointments []models.Appointment
+	database.DB.Preload("Examination").Preload("Doctor").Where("patient_id = ?", userID).Find(&appointments)
+
+	var response []gin.H
+	for _, a := range appointments {
+		response = append(response, gin.H{
+			"id":               a.ID,
+			"date":             a.Date,
+			"is_finished":      a.IsFinished,
+			"examination_name": a.Examination.Name,
+			"doctor_name":      a.Doctor.FirstName + " " + a.Doctor.LastName,
+			"results":          a.Result,
+			"notes":            a.DiagnosticNotes,
+		})
+	}
+	c.JSON(http.StatusOK, response)
 }
 
 func UpdatePatientProfile(c *gin.Context) {
@@ -23,6 +40,11 @@ func UpdatePatientProfile(c *gin.Context) {
 
 	if err := c.BindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
+		return
+	}
+
+	if !utils.IsValidPESEL(body.PESEL) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid PESEL number"})
 		return
 	}
 

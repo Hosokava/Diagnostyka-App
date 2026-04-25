@@ -9,7 +9,23 @@ import (
 )
 
 func GetDoctorSchedule(c *gin.Context) {
-	c.JSON(200, gin.H{"message": "Your schedule"})
+	userID := c.MustGet("userID").(uint)
+	var appointments []models.Appointment
+
+	database.DB.Preload("Examination").Preload("Patient").
+		Where("doctor_id = ? AND is_finished = ?", userID, false).
+		Find(&appointments)
+
+	var response []gin.H
+	for _, a := range appointments {
+		response = append(response, gin.H{
+			"id":               a.ID,
+			"date":             a.Date,
+			"examination_name": a.Examination.Name,
+			"patient_name":     a.Patient.FirstName + " " + a.Patient.LastName,
+		})
+	}
+	c.JSON(http.StatusOK, response)
 }
 
 func UpdateDoctorProfile(c *gin.Context) {

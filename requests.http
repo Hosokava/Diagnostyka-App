@@ -72,7 +72,7 @@ Content-Type: application/json
 {
     "first_name": "Jan",
     "last_name": "Kowalski",
-    "pesel": "90010112345"
+    "pesel": "85092012351"
 }
 
 ### Complete Doctor Profile
@@ -94,3 +94,4 @@ GET http://localhost:8080/api/doctor/profile
 
 ### Get examinations
 GET http://localhost:8080/api/examinations
+
