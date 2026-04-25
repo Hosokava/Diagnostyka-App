@@ -24,17 +24,32 @@ func main() {
 	api.Use(middleware.RequireAuth())
 	{
 		api.GET("/me", handlers.GetMe)
+		api.GET("/examinations", handlers.ListExaminations)
 
 		patient := api.Group("/patient")
 		patient.Use(middleware.RequireRole("patient"))
 		{
-			patient.GET("/appointments", handlers.GetPatientAppointments)
+			patient.POST("/profile", handlers.UpdatePatientProfile)
+			patient.GET("/profile", handlers.GetPatientProfile)
+
+			restricted := patient.Group("/")
+			restricted.Use(middleware.RequireProfileComplete())
+			{
+				restricted.GET("/appointments", handlers.GetPatientAppointments)
+			}
 		}
 
 		doctor := api.Group("/doctor")
 		doctor.Use(middleware.RequireRole("doctor"))
 		{
-			doctor.GET("/schedule", handlers.GetDoctorSchedule)
+			doctor.POST("/profile", handlers.UpdateDoctorProfile)
+			doctor.GET("/profile", handlers.GetDoctorProfile)
+
+			restricted := doctor.Group("/")
+			restricted.Use(middleware.RequireProfileComplete())
+			{
+				restricted.GET("/schedule", handlers.GetDoctorSchedule)
+			}
 		}
 	}
 

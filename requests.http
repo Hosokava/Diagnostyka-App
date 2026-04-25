@@ -61,3 +61,36 @@ Content-Type: application/json
 GET http://localhost:8080/api/patient/appointments
 Content-Type: application/json
 
+### Get doctor schedule
+GET http://localhost:8080/api/doctor/schedule
+Content-Type: application/json
+
+### Complete Patient Profile
+POST http://localhost:8080/api/patient/profile
+Content-Type: application/json
+
+{
+    "first_name": "Jan",
+    "last_name": "Kowalski",
+    "pesel": "90010112345"
+}
+
+### Complete Doctor Profile
+POST http://localhost:8080/api/doctor/profile
+Content-Type: application/json
+
+{
+    "first_name": "Anna",
+    "last_name": "Nowak",
+    "specialization": "Kardiologia",
+    "examination_ids": [1, 2, 6]
+}
+
+### Get patient profile
+GET http://localhost:8080/api/patient/profile
+
+### Get doctor profile
+GET http://localhost:8080/api/doctor/profile
+
+### Get examinations
+GET http://localhost:8080/api/examinations

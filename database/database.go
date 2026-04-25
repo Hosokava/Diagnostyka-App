@@ -49,4 +49,5 @@ func ConnectDB() {
 	}
 
 	DB = db
+	SeedExaminations()
 }
