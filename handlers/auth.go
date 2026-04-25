@@ -61,14 +61,21 @@ func Login(c *gin.Context) {
 	})
 
 	c.SetCookie("access_token", accessToken, 900, "/", "", false, true)
-	c.SetCookie("refresh_token", rawRefresh, 7*24*3600, "/auth/refresh", "", false, true)
+	c.SetCookie("refresh_token", rawRefresh, 7*24*3600, "/", "", false, true)
 
 	c.JSON(200, gin.H{"message": "logged in"})
 }
 
 func Logout(c *gin.Context) {
+	if cookieToken, err := c.Cookie("refresh_token"); err == nil {
+		hash := sha256.Sum256([]byte(cookieToken))
+		hashedToken := hex.EncodeToString(hash[:])
+		database.DB.Where("token_hash = ?", hashedToken).Delete(&models.RefreshToken{})
+	}
+
 	c.SetCookie("access_token", "", -1, "/", "", false, true)
-	c.SetCookie("refresh_token", "", -1, "/auth/refresh", "", false, true)
+	c.SetCookie("refresh_token", "", -1, "/", "", false, true)
+
 	c.JSON(200, gin.H{"message": "logged out"})
 }
 
@@ -119,36 +126,22 @@ func Register(c *gin.Context) {
 }
 
 func Refresh(c *gin.Context) {
-	cookieToken, err := c.Cookie("refresh_token")
+	_, _, err := auth.PerformTokenRefresh(c)
 	if err != nil {
-		c.JSON(401, gin.H{"error": "missing refresh token"})
+		c.JSON(401, gin.H{"error": "Unauthorized"})
 		return
 	}
+	c.JSON(200, gin.H{"message": "Tokens refreshed"})
+}
 
-	hash := sha256.Sum256([]byte(cookieToken))
-	hashedToken := hex.EncodeToString(hash[:])
+func GetMe(c *gin.Context) {
+	userID := c.MustGet("userID").(uint)
+	role := c.MustGet("role").(string)
 
-	var rf models.RefreshToken
-	if err := database.DB.Where("token_hash = ?", hashedToken).First(&rf).Error; err != nil {
-		c.JSON(401, gin.H{"error": "invalid refresh token"})
-		return
-	}
-
-	if time.Now().After(rf.ExpiresAt) {
-		database.DB.Delete(&rf)
-		c.JSON(401, gin.H{"error": "refresh token expired"})
-		return
-	}
-
-	accessToken, _ := auth.GenerateAccessToken(rf.UserID, rf.UserType)
-	rawRefresh, newHashedRefresh, _ := auth.GenerateRefreshToken()
-
-	rf.TokenHash = newHashedRefresh
-	rf.ExpiresAt = time.Now().Add(7 * 24 * time.Hour)
-	database.DB.Save(&rf)
-
-	c.SetCookie("access_token", accessToken, 900, "/", "", false, true)
-	c.SetCookie("refresh_token", rawRefresh, 7*24*3600, "/auth/refresh", "", false, true)
-
-	c.JSON(200, gin.H{"message": "tokens refreshed"})
+	c.JSON(200, gin.H{
+		"authenticated": true,
+		"user_id":       userID,
+		"role":          role,
+		"message":       "You are currently logged in",
+	})
 }

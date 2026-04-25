@@ -2,3 +2,4 @@
 *.env
 *.dll
 *.test
+*.db

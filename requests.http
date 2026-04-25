@@ -1,0 +1,63 @@
+GET http://localhost:8080/ping
+
+### register patient
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+    "email": "patient@example.com",
+    "password": "securepassword123",
+    "role": "patient"
+}
+
+### register doctor
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+    "email": "doctor@example.com",
+    "password": "securepassword123",
+    "role": "doctor",
+    "specialization": "Cardiology"
+}
+
+### Login patient
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+    "email": "patient@example.com",
+    "password": "securepassword123",
+    "role": "patient"
+}
+
+### Logindoctor
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+    "email": "doctor@example.com",
+    "password": "securepassword123",
+    "role": "doctor"
+}
+
+### Refresh Token
+POST http://localhost:8080/auth/refresh
+Content-Type: application/json
+
+{}
+
+### Logout
+POST http://localhost:8080/auth/logout
+Content-Type: application/json
+
+{}
+
+### Get Me
+GET http://localhost:8080/api/me
+Content-Type: application/json
+
+### Get patient appointments
+GET http://localhost:8080/api/patient/appointments
+Content-Type: application/json
+
