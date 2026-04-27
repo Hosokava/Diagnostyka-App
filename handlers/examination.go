@@ -15,7 +15,7 @@ func ListExaminations(c *gin.Context) {
 		return
 	}
 
-	var response []gin.H
+	response := make([]gin.H, 0)
 	for _, e := range examinations {
 		response = append(response, gin.H{
 			"id":          e.ID,

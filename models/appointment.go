@@ -16,7 +16,7 @@ type Appointment struct {
 	Patient         Patient     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	IsFinished      bool        `gorm:"default:false"`
 	QRCodeHash      string      `gorm:"type:varchar(255)"`
-	Date            time.Time   `gorm:"not null"`
+	CompletionDate  *time.Time
 	Result          string      `gorm:"type:text"`
 	DiagnosticNotes string      `gorm:"type:text"`
 }

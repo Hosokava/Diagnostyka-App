@@ -95,3 +95,104 @@ GET http://localhost:8080/api/doctor/profile
 ### Get examinations
 GET http://localhost:8080/api/examinations
 
+### 1. List All English Examinations (Get an ID, e.g., 1)
+GET http://localhost:8080/api/examinations
+Content-Type: application/json
+
+### 2. Book an Appointment (As a Patient)
+POST http://localhost:8080/api/patient/book
+Content-Type: application/json
+
+{
+    "examination_id": 1
+}
+
+### 3. Check My Patient History (See assigned doctor)
+GET http://localhost:8080/api/patient/appointments/history
+Content-Type: application/json
+
+### 3. Check My Patient History (See assigned doctor)
+GET http://localhost:8080/api/patient/appointments/active
+Content-Type: application/json
+
+### 4. Login as Dr. Gregory House (Assigned to Exam #1)
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+    "email": "house@med.pl",
+    "password": "password123",
+    "role": "doctor"
+}
+
+### Complete the Appointment (Doctor)
+POST http://localhost:8080/api/doctor/appointments/16/complete
+Content-Type: application/json
+
+{
+    "result": "Normal",
+    "notes": "Patient is healthy."
+}
+
+### 5. Check Doctor's Work Queue (See the new patient)
+GET http://localhost:8080/api/doctor/schedule/active
+Content-Type: application/json
+
+
+### 6. email test
+### register patient
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+    "email": "dworak.mikolaj@gmail.com",
+    "password": "securepassword123",
+    "role": "patient"
+}
+
+### Login patient
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+    "email": "dworak.mikolaj@gmail.com",
+    "password": "securepassword123",
+    "role": "patient"
+}
+
+### complete profile
+POST http://localhost:8080/api/patient/profile
+Content-Type: application/json
+
+{
+    "first_name": "Mikołaj",
+    "last_name": "Dworak",
+    "pesel": "06301268369"
+}
+
+###
+POST http://localhost:8080/api/patient/book
+Content-Type: application/json
+
+{
+    "examination_id": 3
+}
+
+
+### cancel appointment
+DELETE http://localhost:8080/api/patient/appointments/15
+Content-Type: application/json
+
+{}
+
+### get me
+GET http://localhost:8080/api/me
+
+
+### reveal pesel
+POST http://localhost:8080/api/patient/profile/pesel
+Content-Type: application/json
+
+{
+    "password": "securepassword123"
+}

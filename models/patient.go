@@ -10,5 +10,5 @@ type Patient struct {
 	PasswordHash string `gorm:"type:varchar(255);not null" json:"-"`
 	FirstName    string `gorm:"type:varchar(100)"`
 	LastName     string `gorm:"type:varchar(100)"`
-	PESEL        string `gorm:"type:varchar(11)"`
+	PESEL        string `gorm:"type:varchar(255)"`
 }

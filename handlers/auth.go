@@ -6,11 +6,15 @@ import (
 	"gin-quickstart/auth"
 	"gin-quickstart/database"
 	"gin-quickstart/models"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
+
+var emailRegex = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 
 func Login(c *gin.Context) {
 	var body struct {
@@ -41,7 +45,7 @@ func Login(c *gin.Context) {
 		}
 		userID, passwordHash = doctor.ID, doctor.PasswordHash
 	default:
-		c.JSON(400, gin.H{"error": "invalid role"})
+		c.JSON(400, gin.H{"error": "role must be 'patient' or 'doctor'"})
 		return
 	}
 
@@ -88,6 +92,18 @@ func Register(c *gin.Context) {
 	}
 	if err := c.BindJSON(&body); err != nil {
 		c.JSON(400, gin.H{"error": "invalid body"})
+		return
+	}
+
+	body.Email = strings.ToLower(strings.TrimSpace(body.Email))
+
+	if !emailRegex.MatchString(body.Email) {
+		c.JSON(400, gin.H{"error": "invalid email format"})
+		return
+	}
+
+	if len(body.Password) < 8 {
+		c.JSON(400, gin.H{"error": "password must be at least 8 characters"})
 		return
 	}
 
@@ -138,10 +154,24 @@ func GetMe(c *gin.Context) {
 	userID := c.MustGet("userID").(uint)
 	role := c.MustGet("role").(string)
 
+	profileComplete := false
+	if role == "patient" {
+		var patient models.Patient
+		if err := database.DB.First(&patient, userID).Error; err == nil {
+			profileComplete = patient.FirstName != "" && patient.PESEL != ""
+		}
+	} else if role == "doctor" {
+		var doctor models.Doctor
+		if err := database.DB.Preload("Examinations").First(&doctor, userID).Error; err == nil {
+			profileComplete = doctor.FirstName != "" && doctor.Specialization != "" && len(doctor.Examinations) > 0
+		}
+	}
+
 	c.JSON(200, gin.H{
-		"authenticated": true,
-		"user_id":       userID,
-		"role":          role,
-		"message":       "You are currently logged in",
+		"authenticated":    true,
+		"user_id":          userID,
+		"role":             role,
+		"profile_complete": profileComplete,
+		"message":          "You are currently logged in",
 	})
 }
