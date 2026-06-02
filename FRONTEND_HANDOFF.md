@@ -25,7 +25,7 @@ For local development, ensure the backend is running. By default, it runs on `ht
 1. Copy `.env.example` to `.env` (or coordinate with the backend dev for the required keys).
 2. Run the server using `go run server.go`.
 
-> **Note on CORS:** Currently, the backend CORS is configured to allow requests from `http://localhost:3000` and `http://localhost:5173`. If your frontend runs on a different port, please notify the backend developer to add your origin to the `AllowOrigins` list in `server.go`.
+> **Note on CORS:** Currently, the backend CORS is configured to allow requests from `http://localhost:4200`. If your frontend runs on a different port, please notify the backend developer to add your origin to the `AllowOrigins` list in `server.go`.
 
 ## 4. Error Handling
 
